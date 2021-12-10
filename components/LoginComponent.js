@@ -124,7 +124,6 @@ class LoginTab extends Component {
 class RegisterTab extends Component {
    constructor(props) {
       super(props);
-
       this.state = {
          username: "",
          password: "",
@@ -163,6 +162,7 @@ class RegisterTab extends Component {
          });
          if (!capturedImage.cancelled) {
             console.log(capturedImage);
+            MediaLibrary.saveToLibraryAsync(capturedImage.uri);
             this.processImage(capturedImage.uri);
          }
       }
@@ -183,25 +183,9 @@ class RegisterTab extends Component {
          }
       );
 
-      console.log("test", processedImage);
-      MediaLibrary.saveToLibraryAsync(newImg.uri);
-      this.setState({ imageUrl: processedImage.uri });
-   };
+      console.log(processedImage);
 
-   getImageFromGallery = async () => {
-      const cameraRollPermission = await Permissions.askAsync(
-         Permissions.CAMERA_ROLL
-      );
-      if (cameraRollPermission.status === "granted") {
-         const capturedImage = await ImagePicker.launchImageLibraryAsync({
-            allowsEditing: true,
-            aspect: [1, 1],
-         });
-         if (!capturedImage.cancelled) {
-            console.log("hey", capturedImage);
-            this.processedImage(capturedImage.uri);
-         }
-      }
+      this.setState({ imageUrl: processedImage.uri });
    };
 
    handleRegister() {
@@ -220,6 +204,25 @@ class RegisterTab extends Component {
          );
       }
    }
+
+   getImageFromGallery = async () => {
+      console.log("Hello");
+      const cameraRollPermission = await Permissions.askAsync(
+         Permissions.CAMERA_ROLL
+      );
+
+      if (cameraRollPermission.status === "granted") {
+         const capturedImage = await ImagePicker.launchImageLibraryAsync({
+            allowsEditing: true,
+            aspect: [1, 1],
+         });
+
+         if (!capturedImage.cancelled) {
+            console.log(capturedImage);
+            this.processImage(capturedImage.uri);
+         }
+      }
+   };
 
    render() {
       return (

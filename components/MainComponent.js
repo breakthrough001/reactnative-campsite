@@ -2,12 +2,12 @@ import React, { Component } from "react";
 import Home from "./HomeComponent";
 import Directory from "./DirectoryComponent";
 import CampsiteInfo from "./CampsiteInfoComponent";
-import Contact from "./ContactComponent";
 import About from "./AboutComponent";
-import Constants from "expo-constants";
+import Contact from "./ContactComponent";
+import Reservation from "./ReservationComponent";
 import Favorites from "./FavoritesComponent";
 import Login from "./LoginComponent";
-import Reservation from "./ReservationComponent";
+import Constants from "expo-constants";
 import {
    View,
    Platform,
@@ -356,7 +356,31 @@ class Main extends Component {
       this.props.fetchPromotions();
       this.props.fetchPartners();
 
-      this.showNetInfo();
+      NetInfo.fetch().then((connectionInfo) => {
+         Platform.OS === "ios"
+            ? Alert.alert(
+                 "Initial Network Connectivity Type:",
+                 connectionInfo.type
+              )
+            : ToastAndroid.show(
+                 "Initial Network Connectivity Type: " + connectionInfo.type,
+                 ToastAndroid.LONG
+              );
+      });
+
+      showNetInfo = async () => {
+         const connectionInfo = await NetInfo.fetch();
+
+         Platform.OS === "ios"
+            ? Alert.alert(
+                 "Initial Network Connectivity Type:",
+                 connectionInfo.type
+              )
+            : ToastAndroid.show(
+                 "Initial Network Connectivity Type: " + connectionInfo.type,
+                 ToastAndroid.LONG
+              );
+      };
 
       this.unsubscribeNetInfo = NetInfo.addEventListener((connectionInfo) => {
          this.handleConnectivityChange(connectionInfo);
@@ -367,19 +391,6 @@ class Main extends Component {
       this.unsubscribeNetInfo();
    }
 
-   showNetInfo = async () => {
-      const connectionInfo = await NetInfo.fetch();
-      Platform.OS === "ios"
-         ? Alert.alert(
-              "Initial Network Connectivity Type:",
-              connectionInfo.type
-           )
-         : ToastAndroid.show(
-              "Initial Network Connectivity Type: " + connectionInfo.type,
-              ToastAndroid.LONG
-           );
-   };
-
    handleConnectivityChange = (connectionInfo) => {
       let connectionMsg = "You are now connected to an active network.";
       switch (connectionInfo.type) {
@@ -387,7 +398,7 @@ class Main extends Component {
             connectionMsg = "No network connection is active.";
             break;
          case "unknown":
-            connectionMsg = "The network connection state is now unknown.";
+            connectionMsg = "The network connection is now unknown.";
             break;
          case "cellular":
             connectionMsg = "You are now connected to a cellular network.";
