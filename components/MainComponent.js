@@ -54,6 +54,7 @@ const DirectoryNavigator = createStackNavigator(
             ),
          }),
       },
+
       CampsiteInfo: { screen: CampsiteInfo },
    },
    {
@@ -144,7 +145,6 @@ const ContactNavigator = createStackNavigator(
       }),
    }
 );
-
 const ReservationNavigator = createStackNavigator(
    {
       Reservation: { screen: Reservation },
@@ -194,7 +194,7 @@ const FavoritesNavigator = createStackNavigator(
       }),
    }
 );
-
+// add StackNavigator for the Login component
 const LoginNavigator = createStackNavigator(
    {
       Login: { screen: Login },
@@ -244,6 +244,7 @@ const CustomDrawerContentComponent = (props) => (
 
 const MainNavigator = createDrawerNavigator(
    {
+      // place Login menu option at the top above the Home one
       Login: {
          screen: LoginNavigator,
          navigationOptions: {
@@ -340,6 +341,7 @@ const MainNavigator = createDrawerNavigator(
          },
       },
    },
+
    {
       initialRouteName: "Home",
       drawerBackgroundColor: "#CEC8FF",
@@ -356,31 +358,7 @@ class Main extends Component {
       this.props.fetchPromotions();
       this.props.fetchPartners();
 
-      NetInfo.fetch().then((connectionInfo) => {
-         Platform.OS === "ios"
-            ? Alert.alert(
-                 "Initial Network Connectivity Type:",
-                 connectionInfo.type
-              )
-            : ToastAndroid.show(
-                 "Initial Network Connectivity Type: " + connectionInfo.type,
-                 ToastAndroid.LONG
-              );
-      });
-
-      showNetInfo = async () => {
-         const connectionInfo = await NetInfo.fetch();
-
-         Platform.OS === "ios"
-            ? Alert.alert(
-                 "Initial Network Connectivity Type:",
-                 connectionInfo.type
-              )
-            : ToastAndroid.show(
-                 "Initial Network Connectivity Type: " + connectionInfo.type,
-                 ToastAndroid.LONG
-              );
-      };
+      this.showNetInfo();
 
       this.unsubscribeNetInfo = NetInfo.addEventListener((connectionInfo) => {
          this.handleConnectivityChange(connectionInfo);
@@ -391,6 +369,19 @@ class Main extends Component {
       this.unsubscribeNetInfo();
    }
 
+   showNetInfo = async () => {
+      const connectionInfo = await NetInfo.fetch();
+      Platform.OS === "ios"
+         ? Alert.alert(
+              "Initial Network Connectivity Type:",
+              connectionInfo.type
+           )
+         : ToastAndroid.show(
+              "Initial Network Connectivity Type: " + connectionInfo.type,
+              ToastAndroid.LONG
+           );
+   };
+
    handleConnectivityChange = (connectionInfo) => {
       let connectionMsg = "You are now connected to an active network.";
       switch (connectionInfo.type) {
@@ -398,7 +389,7 @@ class Main extends Component {
             connectionMsg = "No network connection is active.";
             break;
          case "unknown":
-            connectionMsg = "The network connection is now unknown.";
+            connectionMsg = "The network connection state is now unknown.";
             break;
          case "cellular":
             connectionMsg = "You are now connected to a cellular network.";
